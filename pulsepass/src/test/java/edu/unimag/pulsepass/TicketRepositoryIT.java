@@ -35,17 +35,17 @@ class TicketRepositoryIT extends AbstractIntegrationTest {
         User user = User.builder().username("client").email("client@unimag.edu.co").active(true).build();
         userRepository.saveAndFlush(user);
 
-        Ticket t1 = Ticket.builder().ticketCode("TCK-0001").type(TicketType.PAID).price(BigDecimal.valueOf(100)).status(TicketStatus.VIP).purchaseDate(LocalDateTime.now()).user(user).event(event).build();
+        Ticket t1 = Ticket.builder().ticketCode("TCK-0001").type(TicketType.VIP).price(BigDecimal.valueOf(100)).status(TicketStatus.PAID).purchaseDate(LocalDateTime.now()).user(user).event(event).build();
         ticketRepository.saveAndFlush(t1);
 
-        Ticket t2 = Ticket.builder().ticketCode("TCK-0001").type(TicketType.RESERVED).price(BigDecimal.valueOf(50)).status(TicketStatus.GENERAL).purchaseDate(LocalDateTime.now()).user(user).event(event).build();
+        Ticket t2 = Ticket.builder().ticketCode("TCK-0001").type(TicketType.GENERAL).price(BigDecimal.valueOf(50)).status(TicketStatus.RESERVED).purchaseDate(LocalDateTime.now()).user(user).event(event).build();
 
         Assertions.assertThrows(DataIntegrityViolationException.class, () -> ticketRepository.saveAndFlush(t2));
     }
 
     @Test
     void shouldCountOnlyPaidTickets() {
-        long paidCount = ticketRepository.countTicketsByEventCodeAndStatus("CMF-2026", TicketType.PAID);
+        long paidCount = ticketRepository.countTicketsByEventCodeAndStatus("CMF-2026", TicketStatus.PAID);
         Assertions.assertTrue(paidCount >= 0);
     }
 }
