@@ -1,5 +1,8 @@
-package edu.unimag.pulsepass;
+package edu.unimag.pulsepass.repository;
 
+import static org.junit.jupiter.api.Assertions.*;
+
+import edu.unimag.pulsepass.AbstractIntegrationTest;
 import edu.unimag.pulsepass.domain.*;
 import edu.unimag.pulsepass.repository.*;
 import org.junit.jupiter.api.Assertions;
@@ -10,7 +13,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-class TicketRepositoryIT extends AbstractIntegrationTest {
+class TicketRepositoryTest extends AbstractIntegrationTest {
 
     @Autowired
     private VenueRepository venueRepository;
