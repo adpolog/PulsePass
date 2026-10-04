@@ -1,4 +1,9 @@
 package edu.unimag.pulsepass.dto.request;
 
-public class PurchaseTicketRequest {
-}
+import edu.unimag.pulsepass.domain.TicketType;
+
+public record PurchaseTicketRequest(
+        String userEmail,
+        String eventCode,
+        TicketType type
+) {}

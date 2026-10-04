@@ -1,4 +1,13 @@
 package edu.unimag.pulsepass.dto.request;
 
-public class RegisterUserRequest {
-}
+import java.time.LocalDate;
+
+public record RegisterUserRequest(
+        String username,
+        String email,
+        String firstName,
+        String lastName,
+        String phone,
+        String city,
+        LocalDate birthDate
+) {}
