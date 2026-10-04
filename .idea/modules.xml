@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/pulsepass.iml" filepath="$PROJECT_DIR$/.idea/pulsepass.iml" />
+      <module fileurl="file://$PROJECT_DIR$/pulsepass/pulsepass.iml" filepath="$PROJECT_DIR$/pulsepass/pulsepass.iml" />
     </modules>
   </component>
 </project>

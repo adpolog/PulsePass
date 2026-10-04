@@ -1,4 +1,11 @@
 package edu.unimag.pulsepass.dto.response;
 
-public class VenueResponse {
-}
+public record VenueResponse(
+        Long id,
+        String code,
+        String name,
+        String city,
+        String address,
+        Integer capacity,
+        boolean active
+) {}
