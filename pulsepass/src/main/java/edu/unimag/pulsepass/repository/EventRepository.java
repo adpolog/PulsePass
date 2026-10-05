@@ -13,7 +13,7 @@ import java.util.Optional;
 public interface EventRepository extends JpaRepository<Event, Long> {
 
     Optional<Event> findByEventCode(String eventCode);
-
+    boolean existsByEventCode(String eventCode);
     List<Event> findByStatusOrderByEventDateAsc(EventStatus status);
 
     @Query("SELECT e FROM Event e JOIN e.artists a WHERE a.stageName = :stageName")
