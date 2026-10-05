@@ -1,4 +1,8 @@
-package edu.unimag.pulsepass;
+package edu.unimag.pulsepass.repository;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import edu.unimag.pulsepass.AbstractIntegrationTest;
 import edu.unimag.pulsepass.domain.User;
 import edu.unimag.pulsepass.domain.UserProfile;
 import edu.unimag.pulsepass.repository.*;
@@ -6,7 +10,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-class UserProfileIT extends AbstractIntegrationTest {
+class UserRepositoryTest extends AbstractIntegrationTest {
 
     @Autowired
     private UserRepository userRepository;
