@@ -12,5 +12,4 @@ Aplicación backend desarrollada en Spring Boot para la gestión integral de eve
 * **Lombok** (Optimización de código repetitivo)
 
 ## 📌 Enlaces del Proyecto
-* [Feat/repository layer by adpolog · Pull Request #1](https://github.com/adpolog/PulsePass/pull/1)
-* [Feat/service layer by adpolog and daramosh * Pull Request #2](https://github.com/adpolog/PulsePass/pull/2)
+### * [Feat/service layer by adpolog and daramosh * Pull Request #2](https://github.com/adpolog/PulsePass/pull/2)
