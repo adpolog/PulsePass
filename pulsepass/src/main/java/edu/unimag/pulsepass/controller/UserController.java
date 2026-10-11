@@ -20,16 +20,19 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<UserResponse> register(@Valid @RequestBody RegisterUserRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(userService.register(request));
+        UserResponse response = userService.register(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/by-email")
-    public ResponseEntity<UserResponse> findByEmail(@RequestParam String email) {
-        return ResponseEntity.ok(userService.findByEmail(email));
+    public ResponseEntity<UserResponse> getByEmail(@RequestParam String email) {
+        UserResponse response = userService.findByEmail(email);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/by-username")
-    public ResponseEntity<UserResponse> findByUsername(@RequestParam String username) {
-        return ResponseEntity.ok(userService.findByUsername(username));
+    public ResponseEntity<UserResponse> getByUsername(@RequestParam String username) {
+        UserResponse response = userService.findByUsername(username);
+        return ResponseEntity.ok(response);
     }
 }
