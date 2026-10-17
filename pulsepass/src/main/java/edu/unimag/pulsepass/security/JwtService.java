@@ -1,4 +1,4 @@
 package edu.unimag.pulsepass.security;
 
-public class JwtService {
+public class    JwtService {
 }

@@ -24,4 +24,6 @@ public record RegisterUserRequest(
 
         @NotNull(message = "Birth date is required")
         LocalDate birthDate
+
+
 ) {}
