@@ -26,7 +26,7 @@ public class ArtistServiceImpl implements ArtistService {
     @Transactional(readOnly = true)
     public ArtistResponse findById(Long id) {
         Artist artist = artistRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Artista no encontrado con id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Artist not found with ID: " + id));
         return artistMapper.toResponse(artist);
     }
 
@@ -34,7 +34,7 @@ public class ArtistServiceImpl implements ArtistService {
     @Transactional(readOnly = true)
     public ArtistResponse findByStageName(String stageName) {
         Artist artist = artistRepository.findByStageName(stageName)
-                .orElseThrow(() -> new ResourceNotFoundException("Artista no encontrado con nombre: " + stageName));
+                .orElseThrow(() -> new ResourceNotFoundException("Artist not found with name: " + stageName));
         return artistMapper.toResponse(artist);
     }
 
