@@ -32,7 +32,6 @@ public class SecurityConfig {
 
                 .csrf(AbstractHttpConfigurer::disable)
 
-
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
@@ -40,28 +39,28 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
 
-
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(restAuthenticationEntryPoint)
                         .accessDeniedHandler(restAccessDeniedHandler)
                 )
 
-                // 5. Authorization matrix for the 20 endpoints
+
                 .authorizeHttpRequests(auth -> auth
                         // Public Auth & Registration Endpoints
                         .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/users").permitAll()
 
-                        // Venues (Public queries)
+                        // Venues
                         .requestMatchers(HttpMethod.GET, "/api/venues/**").permitAll()
 
-                        // Artists (Public queries)
+                        // Artists
                         .requestMatchers(HttpMethod.GET, "/api/artists/**").permitAll()
 
-                        // Events (Public queries for published events)
+
                         .requestMatchers(HttpMethod.GET, "/api/events/published").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/events/by-artist").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/events/*").permitAll()
 
-                        // Event Management (Exclusively ADMIN)
+                        // Event Management (ADMIN)
                         .requestMatchers(HttpMethod.POST, "/api/events").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PATCH, "/api/events/*/publish").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/events/*/artists/*").hasRole("ADMIN")
@@ -70,10 +69,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PATCH, "/api/tickets/*/use").hasAnyRole("STAFF", "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/events/*/tickets/paid").hasAnyRole("STAFF", "ADMIN")
 
-                        // All other endpoints require explicit authentication
+
                         .anyRequest().authenticated()
                 )
-
 
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
