@@ -26,6 +26,13 @@ public class UserCredential {
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
-    @Column(name = "password_changed_at")
+    @Column(name = "password_changed_at", nullable = false)
     private LocalDateTime passwordChangedAt;
+
+    @PrePersist
+    void onCreate() {
+        if (passwordChangedAt == null) passwordChangedAt = LocalDateTime.now();
+    }
+
+
 }
