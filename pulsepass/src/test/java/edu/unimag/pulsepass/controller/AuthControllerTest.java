@@ -61,7 +61,7 @@ class AuthControllerTest {
     }
 
     private LoginRequest validLogin() {
-        return new LoginRequest("andrea", "UnaFraseSeguraLarga2026!");
+        return new LoginRequest("andrea", "Password123!");
     }
 
 
