@@ -336,7 +336,7 @@ class TicketControllerTest {
     }
 
     @Test
-    @DisplayName("TEST-CTRL-TKT-021: STAFF usa ticket CANCELLED retorna 409 (regla del Service)")
+    @DisplayName("TEST-CTRL-TKT-021: STAFF usa ticket CANCELLED retorna 409 ")
     void markAsUsed_Staff_Invalid_Returns409() throws Exception {
         when(ticketService.markAsUsed("TKT-001"))
                 .thenThrow(new BusinessRuleException("No se puede marcar como usada una boleta CANCELLED"));
