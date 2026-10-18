@@ -40,22 +40,22 @@ public class EventServiceImpl implements EventService {
     @Transactional
     public EventResponse create(CreateEventRequest request) {
         if (eventRepository.existsByEventCode(request.eventCode())) {
-            throw new DuplicateResourceException("El código de evento ya existe."); // BR-EVENT-001
+            throw new DuplicateResourceException("Event code already exists."); // BR-EVENT-001
         }
 
         Venue venue = venueRepository.findByCode(request.venueCode())
-                .orElseThrow(() -> new ResourceNotFoundException("Venue no encontrado.")); // BR-EVENT-002
+                .orElseThrow(() -> new ResourceNotFoundException("Venue not found.")); // BR-EVENT-002
 
         if (!venue.getActive()) {
-            throw new BusinessRuleException("El venue no está activo."); // BR-EVENT-003
+            throw new BusinessRuleException("Venue is not active."); // BR-EVENT-003
         }
 
         if (request.eventDate().isBefore(LocalDateTime.now())) {
-            throw new BusinessRuleException("La fecha del evento debe ser futura."); // BR-EVENT-004
+            throw new BusinessRuleException("Minimum age must be greater than or equal to 0."); // BR-EVENT-004
         }
 
         if (request.minimumAge() < 0) {
-            throw new BusinessRuleException("La edad mínima debe ser mayor o igual a 0."); // BR-EVENT-006
+            throw new BusinessRuleException("Event date must be in the future."); // BR-EVENT-006
         }
 
         Event event = new Event();

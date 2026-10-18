@@ -39,33 +39,33 @@ public class TicketServiceImpl implements TicketService {
     public TicketResponse purchase(PurchaseTicketRequest request) {
         // BR-TICKET-001 y 002
         User user = userRepository.findByEmailIgnoreCase(request.userEmail())
-                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado: " + request.userEmail()));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + request.userEmail()));
         if (!user.getActive()) {
-            throw new BusinessRuleException("Un usuario inactivo no puede comprar tickets.");
+            throw new BusinessRuleException("Inactive user can't buy tickets");
         }
 
         // 2. BR-TICKET-003, 004 y 005
         Event event = eventRepository.findByEventCode(request.eventCode())
-                .orElseThrow(() -> new ResourceNotFoundException("Evento no encontrado: " + request.eventCode()));
+                .orElseThrow(() -> new ResourceNotFoundException("Event not found: " + request.eventCode()));
         if (event.getStatus() != EventStatus.PUBLISHED) {
-            throw new BusinessRuleException("Solo se pueden comprar tickets para eventos publicados.");
+            throw new BusinessRuleException("Tickets can only be purchased for published events.");
         }
         if (event.getEventDate().isBefore(LocalDateTime.now())) {
-            throw new BusinessRuleException("No se puede comprar tickets para un evento pasado.");
+            throw new BusinessRuleException("Cannot purchase tickets for a past event.");
         }
 
         // 3. (BR-TICKET-006
         if (event.getMinimumAge() > 0) {
             int ageAtEvent = Period.between(user.getUserProfile().getBirthDate(), event.getEventDate().toLocalDate()).getYears();
             if (ageAtEvent < event.getMinimumAge()) {
-                throw new BusinessRuleException("El usuario no cumple con la edad mínima requerida.");
+                throw new BusinessRuleException("User does not meet the minimum required age.");
             }
         }
 
         // 4. BR-TICKET-007
         long paidTickets = ticketRepository.countTicketsByEventCodeAndStatus(event.getEventCode(), TicketStatus.PAID);
         if (paidTickets >= event.getVenue().getCapacity()) {
-            throw new BusinessRuleException("El evento no tiene capacidad disponible.");
+            throw new BusinessRuleException("The event has no available capacity.");
         }
 
         // 5. BR-TICKET-009
@@ -92,15 +92,15 @@ public class TicketServiceImpl implements TicketService {
     @Transactional
     public TicketResponse cancel(String ticketCode) {
         Ticket ticket = ticketRepository.findByTicketCode(ticketCode)
-                .orElseThrow(() -> new ResourceNotFoundException("Ticket no encontrado."));
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket not found."));
 
         // BR-TICKET-010 y 011
         if (ticket.getStatus() != TicketStatus.PAID) {
-            throw new BusinessRuleException("Solo se puede cancelar un ticket en estado PAID.");
+            throw new BusinessRuleException("Only tickets in PAID status can be cancelled.");
         }
         // BR-TICKET-012
         if (ticket.getEvent().getEventDate().isBefore(LocalDateTime.now())) {
-            throw new BusinessRuleException("No se puede cancelar el ticket después de la fecha del evento.");
+            throw new BusinessRuleException("Cannot cancel a ticket after the event date.");
         }
 
         ticket.setStatus(TicketStatus.CANCELLED);
@@ -111,11 +111,11 @@ public class TicketServiceImpl implements TicketService {
     @Transactional
     public TicketResponse markAsUsed(String ticketCode) {
         Ticket ticket = ticketRepository.findByTicketCode(ticketCode)
-                .orElseThrow(() -> new ResourceNotFoundException("Ticket no encontrado."));
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket not found."));
 
         // BR-TICKET-013 y 014
         if (ticket.getStatus() != TicketStatus.PAID) {
-            throw new BusinessRuleException("Solo se puede usar un ticket en estado PAID.");
+            throw new BusinessRuleException("Only tickets in PAID status can be used.");
         }
 
         ticket.setStatus(TicketStatus.USED);
@@ -127,7 +127,7 @@ public class TicketServiceImpl implements TicketService {
     public TicketResponse findByCode(String ticketCode) {
         return ticketRepository.findByTicketCode(ticketCode)
                 .map(ticketMapper::toResponse)
-                .orElseThrow(() -> new ResourceNotFoundException("Ticket no encontrado."));
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket not found."));
     }
 
     @Override
@@ -142,7 +142,7 @@ public class TicketServiceImpl implements TicketService {
     @Override
     @Transactional(readOnly = true)
     public List<TicketResponse> findPaidTicketsByEvent(String eventCode) {
-        throw new UnsupportedOperationException("Requiere método findByEventEventCodeAndStatus en TicketRepository");
+        throw new UnsupportedOperationException("Requires findByEventEventCodeAndStatus method in TicketRepository");
     }
 
     // Estrategia de precio básica BR-TICKET-009

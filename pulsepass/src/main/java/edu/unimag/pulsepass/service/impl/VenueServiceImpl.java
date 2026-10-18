@@ -26,7 +26,7 @@ public class VenueServiceImpl implements VenueService {
     @Transactional(readOnly = true)
     public VenueResponse findByCode(String code) {
         Venue venue = venueRepository.findByCode(code)
-                .orElseThrow(() -> new ResourceNotFoundException("Venue no encontrado con código: " + code));
+                .orElseThrow(() -> new ResourceNotFoundException("Venue not found with code " + code));
         return venueMapper.toResponse(venue);
     }
 

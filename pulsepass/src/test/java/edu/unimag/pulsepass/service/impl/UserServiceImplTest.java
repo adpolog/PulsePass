@@ -34,8 +34,8 @@ class UserServiceImplTest {
 
     @Test
     void register_WhenValid_ShouldSaveUserAndReturnResponse() {
-        RegisterUserRequest request = new RegisterUserRequest("andrea", "andrea@email.com",
-                "Andrea", "Perez", "12345", "Santa Marta", LocalDate.of(2000, 1, 1));
+        RegisterUserRequest request = new RegisterUserRequest("andrea", "andrea@email.com", "Andrea", "Perez",
+                "12345", "Santa Marta", LocalDate.of(2000, 1, 1), "Password1234!");
 
         User user = new User();
         UserResponse response = new UserResponse(1L, "andrea", "andrea@email.com", "Andrea", "Perez", true);
@@ -54,8 +54,8 @@ class UserServiceImplTest {
 
     @Test
     void register_WhenUsernameExists_ShouldThrowDuplicateResourceException() {
-        RegisterUserRequest request = new RegisterUserRequest("andrea", "andrea@email.com",
-                "Andrea", "Perez", "12345", "Santa Marta", LocalDate.of(2000, 1, 1));
+        RegisterUserRequest request =new RegisterUserRequest("andrea", "andrea@email.com", "Andrea", "Perez",
+                "12345", "Santa Marta", LocalDate.of(2000, 1, 1), "Password1234!");
 
         when(userRepository.existsByUsername("andrea")).thenReturn(true);
 
@@ -67,8 +67,8 @@ class UserServiceImplTest {
 
     @Test
     void register_WhenEmailExists_ShouldThrowDuplicateResourceException() {
-        RegisterUserRequest request = new RegisterUserRequest("andrea", "andrea@email.com",
-                "Andrea", "Perez", "12345", "Santa Marta", LocalDate.of(2000, 1, 1));
+        RegisterUserRequest request =new RegisterUserRequest("andrea", "andrea@email.com", "Andrea", "Perez",
+                "12345", "Santa Marta", LocalDate.of(2000, 1, 1), "Password1234!");
 
         when(userRepository.existsByUsername("andrea")).thenReturn(false);
         when(userRepository.existsByEmailIgnoreCase("andrea@email.com")).thenReturn(true);
@@ -81,8 +81,9 @@ class UserServiceImplTest {
 
     @Test
     void register_WhenBirthDateInFuture_ShouldThrowBusinessRuleException() {
-        RegisterUserRequest request = new RegisterUserRequest("andrea", "andrea@email.com",
-                "Andrea", "Perez", "12345", "Santa Marta", LocalDate.now().plusDays(1));
+
+        RegisterUserRequest request = new RegisterUserRequest("andrea", "andrea@email.com", "Andrea", "Perez",
+                "12345", "Santa Marta", LocalDate.now().plusDays(1), "Password1234!");
 
         when(userRepository.existsByUsername("andrea")).thenReturn(false);
         when(userRepository.existsByEmailIgnoreCase("andrea@email.com")).thenReturn(false);

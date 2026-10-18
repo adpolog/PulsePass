@@ -30,13 +30,13 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserResponse register(RegisterUserRequest request) {
         if (userRepository.existsByUsername(request.username())) {
-            throw new DuplicateResourceException("El username ya está en uso."); // BR-USER-001
+            throw new DuplicateResourceException("Username is already in use."); // BR-USER-001
         }
         if (userRepository.existsByEmailIgnoreCase(request.email())) {
-            throw new DuplicateResourceException("El email ya está registrado."); // BR-USER-002
+            throw new DuplicateResourceException("Email is already registered."); // BR-USER-002
         }
         if (request.birthDate().isAfter(LocalDate.now())) {
-            throw new BusinessRuleException("La fecha de nacimiento no puede ser futura."); // BR-USER-005
+            throw new BusinessRuleException("Birth date cannot be in the future."); // BR-USER-005
         }
 
         User user = new User();
@@ -65,7 +65,7 @@ public class UserServiceImpl implements UserService {
     public UserResponse findByEmail(String email) {
         return userRepository.findByEmailIgnoreCase(email)
                 .map(userMapper::toResponse)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con email: " + email));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
     }
 
     @Override
@@ -73,6 +73,6 @@ public class UserServiceImpl implements UserService {
     public UserResponse findByUsername(String username) {
         return userRepository.findByUsername(username)
                 .map(userMapper::toResponse)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con username: " + username));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with username: " + username));
     }
 }
