@@ -1,10 +1,9 @@
-package edu.unimag.pulsepass.service;
+package edu.unimag.pulsepass.security;
 
 import edu.unimag.pulsepass.domain.Role;
 import edu.unimag.pulsepass.domain.Ticket;
 import edu.unimag.pulsepass.repository.TicketRepository;
 import edu.unimag.pulsepass.repository.UserRepository;
-import edu.unimag.pulsepass.security.SecurityPrincipal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;

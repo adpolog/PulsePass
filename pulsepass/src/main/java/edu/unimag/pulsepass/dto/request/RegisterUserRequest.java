@@ -30,7 +30,7 @@ public record RegisterUserRequest(
         LocalDate birthDate,
 
         @NotBlank(message = "Password is required")
-        @Size(min = 12, message = "Password must have at least 12 characters")
+        @Size(min = 12, max = 72, message = "Password must be between 12 and 72 characters")
         String password
 ) {
         /** Nunca imprimir la contraseña (logs, excepciones). */

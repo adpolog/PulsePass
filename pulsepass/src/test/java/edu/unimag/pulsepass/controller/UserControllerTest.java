@@ -10,7 +10,7 @@ import edu.unimag.pulsepass.security.RestAuthenticationEntryPoint;
 import edu.unimag.pulsepass.security.SecurityConfig;
 import edu.unimag.pulsepass.security.SecurityPrincipal;
 import edu.unimag.pulsepass.service.AuthService;
-import edu.unimag.pulsepass.service.AuthorizationService;
+import edu.unimag.pulsepass.security.AuthorizationService;
 import edu.unimag.pulsepass.service.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -67,10 +67,9 @@ class UserControllerTest {
     }
 
     private RegisterUserRequest validRequest() {
-        return new RegisterUserRequest(
-                "andrea", "andrea@test.com", "Andrea", "Perez", "3001234567",
-                "Santa Marta", LocalDate.of(2000, 1, 1), "Password1234!"
-        );
+        return new RegisterUserRequest("andrea", "andrea@email.com",
+                "Andrea", "Perez", "12345", "Santa Marta", LocalDate.of(2000, 1, 1),
+                "Password1234!");
     }
 
     private UserResponse andreaResponse() {

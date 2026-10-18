@@ -12,7 +12,7 @@ import edu.unimag.pulsepass.security.JwtService;
 import edu.unimag.pulsepass.security.RestAccessDeniedHandler;
 import edu.unimag.pulsepass.security.RestAuthenticationEntryPoint;
 import edu.unimag.pulsepass.security.SecurityConfig;
-import edu.unimag.pulsepass.service.AuthorizationService;
+import edu.unimag.pulsepass.security.AuthorizationService;
 import edu.unimag.pulsepass.service.EventService;
 import edu.unimag.pulsepass.service.TicketService;
 import org.junit.jupiter.api.DisplayName;
