@@ -8,11 +8,7 @@ import edu.unimag.pulsepass.dto.response.EventSummaryResponse;
 import edu.unimag.pulsepass.exception.BusinessRuleException;
 import edu.unimag.pulsepass.exception.GlobalExceptionHandler;
 import edu.unimag.pulsepass.exception.ResourceNotFoundException;
-import edu.unimag.pulsepass.security.JwtService;
-import edu.unimag.pulsepass.security.RestAccessDeniedHandler;
-import edu.unimag.pulsepass.security.RestAuthenticationEntryPoint;
-import edu.unimag.pulsepass.security.SecurityConfig;
-import edu.unimag.pulsepass.security.AuthorizationService;
+import edu.unimag.pulsepass.security.*;
 import edu.unimag.pulsepass.service.EventService;
 import edu.unimag.pulsepass.service.TicketService;
 import org.junit.jupiter.api.DisplayName;
@@ -47,6 +43,9 @@ class EventControllerTest {
 
     @MockitoBean
     private JwtService jwtService;
+
+    @MockitoBean
+    private CustomUserDetailsService customUserDetailsService;
 
     @MockitoBean
     private EventService eventService;

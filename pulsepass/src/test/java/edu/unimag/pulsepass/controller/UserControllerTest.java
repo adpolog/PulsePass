@@ -4,13 +4,8 @@ import edu.unimag.pulsepass.dto.request.RegisterUserRequest;
 import edu.unimag.pulsepass.dto.response.UserResponse;
 import edu.unimag.pulsepass.exception.DuplicateResourceException;
 import edu.unimag.pulsepass.exception.GlobalExceptionHandler;
-import edu.unimag.pulsepass.security.JwtService;
-import edu.unimag.pulsepass.security.RestAccessDeniedHandler;
-import edu.unimag.pulsepass.security.RestAuthenticationEntryPoint;
-import edu.unimag.pulsepass.security.SecurityConfig;
-import edu.unimag.pulsepass.security.SecurityPrincipal;
+import edu.unimag.pulsepass.security.*;
 import edu.unimag.pulsepass.service.AuthService;
-import edu.unimag.pulsepass.security.AuthorizationService;
 import edu.unimag.pulsepass.service.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -48,6 +43,9 @@ class UserControllerTest {
 
     @MockitoBean
     private JwtService jwtService;
+
+    @MockitoBean
+    private CustomUserDetailsService customUserDetailsService;
 
     @MockitoBean
     private UserService userService;

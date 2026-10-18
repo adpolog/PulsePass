@@ -3,10 +3,7 @@ package edu.unimag.pulsepass.controller;
 import edu.unimag.pulsepass.dto.response.VenueResponse;
 import edu.unimag.pulsepass.exception.GlobalExceptionHandler;
 import edu.unimag.pulsepass.exception.ResourceNotFoundException;
-import edu.unimag.pulsepass.security.JwtService;
-import edu.unimag.pulsepass.security.RestAccessDeniedHandler;
-import edu.unimag.pulsepass.security.RestAuthenticationEntryPoint;
-import edu.unimag.pulsepass.security.SecurityConfig;
+import edu.unimag.pulsepass.security.*;
 import edu.unimag.pulsepass.service.VenueService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,13 +13,11 @@ import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-
 import java.util.List;
 
-import static org.mockito.Mockito.verifyNoInteractions;
+
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(VenueController.class)
@@ -35,6 +30,9 @@ class VenueControllerTest {
 
     @MockitoBean
     private JwtService jwtService;
+
+    @MockitoBean
+    private CustomUserDetailsService customUserDetailsService;
 
     @MockitoBean
     private VenueService venueService;

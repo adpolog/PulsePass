@@ -7,7 +7,7 @@ import edu.unimag.pulsepass.domain.User;
 import edu.unimag.pulsepass.repository.TicketRepository;
 import edu.unimag.pulsepass.repository.UserRepository;
 import edu.unimag.pulsepass.security.SecurityPrincipal;
-import edu.unimag.pulsepass.service.AuthorizationService;
+import edu.unimag.pulsepass.security.AuthorizationService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -42,7 +42,7 @@ class AuthorizationServiceTest {
         GrantedAuthority auth = mock(GrantedAuthority.class);
         lenient().when(auth.getAuthority()).thenReturn(role.getAuthority());
 
-        // Se hace un cast crudo para evitar problemas de tipos genéricos con Mockito
+
         lenient().doReturn(List.of(auth)).when(principal).getAuthorities();
 
         return principal;
