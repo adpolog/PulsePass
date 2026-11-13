@@ -3,7 +3,6 @@ import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 
-// GAP-05: en desarrollo, /api se redirige al backend Spring (sin CORS).
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
@@ -15,5 +14,6 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
     css: false,
+    env: { VITE_API_BASE_URL: 'http://localhost/api' },
   },
 })

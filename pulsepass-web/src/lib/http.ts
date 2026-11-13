@@ -1,9 +1,6 @@
 import { z } from 'zod'
 
-
-
 export const ErrorResponseSchema = z.object({
-  // LocalDateTime: no se usa en la UI, se acepta sin imponer formato.
   timestamp: z.unknown().optional(),
   status: z.number().int(),
   error: z.string().optional(),
@@ -15,138 +12,128 @@ export const ErrorResponseSchema = z.object({
 })
 export type ErrorResponse = z.infer<typeof ErrorResponseSchema>
 
+// network: no response · http: non-2xx status · contract: 2xx body that fails the schema
+export type ApiErrorKind = 'network' | 'http' | 'contract'
 
-export type TipoApiError = 'red' | 'http' | 'contrato'
-
-export const MENSAJE_RED = 'No pudimos conectar con el servidor.'
-export const MENSAJE_GENERICO = 'Ocurrió un error inesperado. Inténtalo más tarde.'
+export const NETWORK_MESSAGE = 'No pudimos conectar con el servidor.'
+export const GENERIC_MESSAGE = 'Ocurrió un error inesperado. Inténtalo más tarde.'
 
 export class ApiError extends Error {
   readonly status: number
   readonly details: Record<string, string>
-  readonly tipo: TipoApiError
+  readonly kind: ApiErrorKind
 
   constructor(
     status: number,
     message: string,
     details: Record<string, string> = {},
-    tipo: TipoApiError = 'http',
+    kind: ApiErrorKind = 'http',
   ) {
     super(message)
     this.name = 'ApiError'
     this.status = status
     this.details = details
-    this.tipo = tipo
+    this.kind = kind
   }
 }
 
-export function esApiError(error: unknown): error is ApiError {
+export function isApiError(error: unknown): error is ApiError {
   return error instanceof ApiError
 }
 
+// In-memory token and 401 handler, both set by AuthContext.
+let authToken: string | null = null
+let unauthorizedHandler: () => void = () => {}
 
-// Token en memoria y aviso de 401: los actualiza AuthContext.
-let tokenActual: string | null = null
-let alNoAutorizado: () => void = () => {}
-
-export function establecerToken(token: string | null): void {
-  tokenActual = token
+export function setAuthToken(token: string | null): void {
+  authToken = token
 }
 
-export function alRecibirNoAutorizado(manejador: () => void): void {
-  alNoAutorizado = manejador
+export function onUnauthorized(handler: () => void): void {
+  unauthorizedHandler = handler
 }
 
+const BASE_URL: string = import.meta.env.VITE_API_BASE_URL ?? '/api'
 
-const URL_BASE: string = import.meta.env.VITE_API_BASE_URL ?? '/api'
+type Method = 'GET' | 'POST' | 'PATCH'
+type QueryParams = Record<string, string | number | undefined>
 
-type Metodo = 'GET' | 'POST' | 'PATCH'
-type ParametrosConsulta = Record<string, string | number | undefined>
-
-interface OpcionesPeticion {
-  metodo?: Metodo
-  cuerpo?: unknown
-  params?: ParametrosConsulta
+interface RequestOptions {
+  method?: Method
+  body?: unknown
+  params?: QueryParams
   signal?: AbortSignal
 }
 
-function construirUrl(ruta: string, params?: ParametrosConsulta): string {
-  const url = `${URL_BASE}${ruta}`
+function buildUrl(path: string, params?: QueryParams): string {
+  const url = `${BASE_URL}${path}`
   if (!params) return url
-  const consulta = new URLSearchParams()
-  for (const [clave, valor] of Object.entries(params)) {
-    if (valor !== undefined) consulta.set(clave, String(valor))
+  const query = new URLSearchParams()
+  for (const [key, value] of Object.entries(params)) {
+    if (value !== undefined) query.set(key, String(value))
   }
-  const texto = consulta.toString()
-  return texto ? `${url}?${texto}` : url
+  const text = query.toString()
+  return text ? `${url}?${text}` : url
 }
 
-async function leerJson(respuesta: Response): Promise<unknown> {
-  const texto = await respuesta.text()
-  if (!texto) return undefined
+async function readJson(response: Response): Promise<unknown> {
+  const text = await response.text()
+  if (!text) return undefined
   try {
-    return JSON.parse(texto) as unknown
+    return JSON.parse(text) as unknown
   } catch {
     return undefined
   }
 }
 
-async function aApiError(respuesta: Response): Promise<ApiError> {
-  const resultado = ErrorResponseSchema.safeParse(await leerJson(respuesta))
-  if (!resultado.success) {
-    return new ApiError(respuesta.status, MENSAJE_GENERICO)
-  }
-  return new ApiError(respuesta.status, resultado.data.message, resultado.data.details)
+async function toApiError(response: Response): Promise<ApiError> {
+  const result = ErrorResponseSchema.safeParse(await readJson(response))
+  if (!result.success) return new ApiError(response.status, GENERIC_MESSAGE)
+  return new ApiError(response.status, result.data.message, result.data.details)
 }
 
-export async function peticion<T>(
-  ruta: string,
-  esquema: z.ZodType<T>,
-  { metodo = 'GET', cuerpo, params, signal }: OpcionesPeticion = {},
+export async function request<T>(
+  path: string,
+  schema: z.ZodType<T>,
+  { method = 'GET', body, params, signal }: RequestOptions = {},
 ): Promise<T> {
-  const token = tokenActual
+  const token = authToken
+  const headers = new Headers({ Accept: 'application/json' })
+  if (body !== undefined) headers.set('Content-Type', 'application/json')
+  if (token) headers.set('Authorization', `Bearer ${token}`)
 
-  const encabezados = new Headers({ Accept: 'application/json' })
-  if (cuerpo !== undefined) encabezados.set('Content-Type', 'application/json')
-  if (token) encabezados.set('Authorization', `Bearer ${token}`)
-
-  let respuesta: Response
+  let response: Response
   try {
-    respuesta = await fetch(construirUrl(ruta, params), {
-      method: metodo,
-      headers: encabezados,
-      body: cuerpo !== undefined ? JSON.stringify(cuerpo) : undefined,
+    response = await fetch(buildUrl(path, params), {
+      method,
+      headers,
+      body: body !== undefined ? JSON.stringify(body) : undefined,
       signal,
     })
   } catch (error: unknown) {
-    // Las cancelaciones de TanStack Query no son errores de red.
+    // TanStack Query cancellations are not network errors.
     if (error instanceof DOMException && error.name === 'AbortError') throw error
-    throw new ApiError(0, MENSAJE_RED, {}, 'red')
+    throw new ApiError(0, NETWORK_MESSAGE, {}, 'network')
   }
 
-  if (!respuesta.ok) {
-    // 401 con token enviado = sesión expirada. El 401 del login (sin token) lo maneja la pantalla.
-    if (respuesta.status === 401 && token) alNoAutorizado()
-    throw await aApiError(respuesta)
+  if (!response.ok) {
+    // 401 with a token means the session expired; a 401 on login (no token) is handled by the page.
+    if (response.status === 401 && token) unauthorizedHandler()
+    throw await toApiError(response)
   }
 
-  const resultado = esquema.safeParse(await leerJson(respuesta))
-  if (!resultado.success) {
-    throw new ApiError(respuesta.status, MENSAJE_GENERICO, {}, 'contrato')
-  }
-  return resultado.data
+  const result = schema.safeParse(await readJson(response))
+  if (!result.success) throw new ApiError(response.status, GENERIC_MESSAGE, {}, 'contract')
+  return result.data
 }
 
-
-type OpcionesSinMetodo = Omit<OpcionesPeticion, 'metodo' | 'cuerpo'>
+type ShortOptions = Omit<RequestOptions, 'method' | 'body'>
 
 export const http = {
-  get: <T>(ruta: string, esquema: z.ZodType<T>, opciones?: OpcionesSinMetodo) =>
-    peticion(ruta, esquema, { ...opciones, metodo: 'GET' }),
-
-  post: <T>(ruta: string, esquema: z.ZodType<T>, cuerpo?: unknown, opciones?: OpcionesSinMetodo) =>
-    peticion(ruta, esquema, { ...opciones, metodo: 'POST', cuerpo }),
-
-  patch: <T>(ruta: string, esquema: z.ZodType<T>, cuerpo?: unknown, opciones?: OpcionesSinMetodo) =>
-    peticion(ruta, esquema, { ...opciones, metodo: 'PATCH', cuerpo }),
+  get: <T>(path: string, schema: z.ZodType<T>, options?: ShortOptions) =>
+    request(path, schema, { ...options, method: 'GET' }),
+  post: <T>(path: string, schema: z.ZodType<T>, body?: unknown, options?: ShortOptions) =>
+    request(path, schema, { ...options, method: 'POST', body }),
+  patch: <T>(path: string, schema: z.ZodType<T>, body?: unknown, options?: ShortOptions) =>
+    request(path, schema, { ...options, method: 'PATCH', body }),
 }

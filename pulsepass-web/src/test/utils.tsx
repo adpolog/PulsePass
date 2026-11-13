@@ -3,28 +3,28 @@ import { render } from '@testing-library/react'
 import { createMemoryRouter } from 'react-router'
 import { RouterProvider } from 'react-router/dom'
 import { vi } from 'vitest'
-import { AuthContext, type ContextoAuth } from '../funcionalidades/auth/contexto'
-import type { Rol, Sesion } from '../funcionalidades/auth/tipos'
-import { rutas } from '../router'
+import { AuthContext, type AuthContextValue } from '../features/auth/context'
+import type { Role, Session } from '../features/auth/types'
+import { routes } from '../router'
 
-export function sesionCon(...roles: Rol[]): Sesion {
+export function sessionWith(...roles: Role[]): Session {
   return {
-    estado: 'autenticado',
-    token: 'token-de-prueba',
-    expiraEn: Date.now() + 900_000,
-    usuario: { id: 1, username: 'andrea', email: 'andrea@pulsepass.test', roles },
+    status: 'authenticated',
+    token: 'test-token',
+    expiresAt: Date.now() + 900_000,
+    user: { id: 1, username: 'andrea', email: 'andrea@pulsepass.test', roles },
   }
 }
 
-// Renderiza la app completa en una ruta, con una sesión simulada.
-export function renderRuta(ruta: string, sesion: Sesion = { estado: 'anonimo' }) {
-  const router = createMemoryRouter(rutas, { initialEntries: [ruta] })
-  const auth: ContextoAuth = {
-    sesion,
-    iniciarSesion: vi.fn(),
-    cerrarSesion: vi.fn(),
-    tieneRol: (...roles) =>
-      sesion.estado === 'autenticado' && roles.some((r) => sesion.usuario.roles.includes(r)),
+// Renders the whole app at a route with a fake session; the API is mocked by MSW.
+export function renderRoute(path: string, session: Session = { status: 'anonymous' }) {
+  const router = createMemoryRouter(routes, { initialEntries: [path] })
+  const auth: AuthContextValue = {
+    session,
+    login: vi.fn(),
+    logout: vi.fn(),
+    hasRole: (...roles: Role[]) =>
+      session.status === 'authenticated' && roles.some((r) => session.user.roles.includes(r)),
   }
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
 

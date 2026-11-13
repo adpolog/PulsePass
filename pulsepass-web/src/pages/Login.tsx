@@ -1,10 +1,11 @@
-import Contenedor from '../componentes/Contenedor'
+import Container from '../components/Container'
+import PageHeader from '../components/PageHeader'
 
 export default function Login() {
   return (
-    <Contenedor ancho="estrecho">
-      <h1 className="text-3xl font-extrabold">Inicia sesión</h1>
-      <p className="mt-2 text-texto-suave">Página en construcción.</p>
-    </Contenedor>
+    <Container width="narrow">
+      <PageHeader title="Inicia sesión" />
+      <p className="text-muted">Página en construcción.</p>
+    </Container>
   )
 }

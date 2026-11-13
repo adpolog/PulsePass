@@ -1,110 +1,111 @@
 import { clsx } from 'clsx'
 import { useState } from 'react'
 import { Link, NavLink } from 'react-router'
-import { clasesBoton } from '../componentes/estilos'
-import { IconoCerrar, IconoMenu } from '../componentes/iconos'
-import { useAuth } from '../funcionalidades/auth/hooks'
-import type { Rol } from '../funcionalidades/auth/tipos'
-import { RUTAS } from '../lib/rutas'
+import { IconClose, IconMenu } from '../components/icons'
+import { buttonClasses } from '../components/styles'
+import { useAuth } from '../features/auth/hooks'
+import type { Role } from '../features/auth/types'
+import { ROUTES } from '../lib/routes'
 import Logo from './Logo'
-import MenuUsuario from './MenuUsuario'
+import UserMenu from './UserMenu'
 
-interface Enlace {
+interface NavItem {
   to: string
-  texto: string
-  roles?: Rol[]
+  label: string
+  roles?: Role[]
 }
 
-// Tabla 8.4 del PRD: sin `roles` el enlace es público.
-const enlaces: Enlace[] = [
-  { to: RUTAS.eventos, texto: 'Eventos' },
-  { to: RUTAS.artistas, texto: 'Artistas' },
-  { to: RUTAS.sedes, texto: 'Sedes' },
-  { to: RUTAS.misTickets, texto: 'Mis tickets', roles: ['USER'] },
-  { to: RUTAS.validacion, texto: 'Validar ingreso', roles: ['STAFF', 'ADMIN'] },
-  { to: RUTAS.ticketsPagados(), texto: 'Tickets pagados', roles: ['STAFF', 'ADMIN'] },
-  { to: RUTAS.adminEventos, texto: 'Administrar eventos', roles: ['ADMIN'] },
+const navItems: NavItem[] = [
+  { to: ROUTES.events, label: 'Eventos' },
+  { to: ROUTES.artists, label: 'Artistas' },
+  { to: ROUTES.venues, label: 'Sedes' },
+  { to: ROUTES.myTickets, label: 'Mis tickets', roles: ['USER'] },
+  { to: ROUTES.checkIn, label: 'Validar ingreso', roles: ['STAFF', 'ADMIN'] },
+  { to: ROUTES.paidTickets(), label: 'Tickets pagados', roles: ['STAFF', 'ADMIN'] },
+  { to: ROUTES.adminEvents, label: 'Administrar eventos', roles: ['ADMIN'] },
 ]
 
-const claseEnlace = ({ isActive }: { isActive: boolean }) =>
+const linkClass = ({ isActive }: { isActive: boolean }) =>
   clsx(
-    'rounded-md px-3 py-2 text-sm font-medium transition',
-    isActive ? 'bg-neon-950 text-neon-300' : 'text-texto-suave hover:text-white',
+    'rounded-full px-3 py-1.5 text-sm font-medium transition',
+    isActive ? 'bg-neon-400 text-ink-950' : 'text-muted hover:text-white',
   )
 
 export default function Navbar() {
-  const { sesion, tieneRol } = useAuth()
-  const [menuAbierto, setMenuAbierto] = useState(false)
-  const visibles = enlaces.filter((e) => !e.roles || tieneRol(...e.roles))
-  const anonimo = sesion.estado !== 'autenticado'
-  const cerrarMenu = () => setMenuAbierto(false)
+  const { session, hasRole } = useAuth()
+  const [menuOpen, setMenuOpen] = useState(false)
+  const visible = navItems.filter((item) => !item.roles || hasRole(...item.roles))
+  const isGuest = session.status !== 'authenticated'
+  const closeMenu = () => setMenuOpen(false)
 
   return (
-    <header className="sticky top-0 z-40 border-b border-borde bg-fondo/90 backdrop-blur">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4">
-        <div className="flex items-center gap-6">
-          <Logo />
-          <nav aria-label="Principal" className="hidden items-center gap-1 md:flex">
-            {visibles.map((e) => (
-              <NavLink key={e.to} to={e.to} className={claseEnlace}>
-                {e.texto}
-              </NavLink>
-            ))}
-          </nav>
-        </div>
+    <header className="sticky top-0 z-40 px-3 pt-3">
+      <div className="mx-auto max-w-6xl rounded-2xl border border-line bg-surface/80 backdrop-blur">
+        <div className="flex h-16 items-center justify-between gap-4 px-4">
+          <div className="flex items-center gap-6">
+            <Logo />
+            <nav aria-label="Principal" className="hidden items-center gap-1 md:flex">
+              {visible.map((item) => (
+                <NavLink key={item.to} to={item.to} className={linkClass}>
+                  {item.label}
+                </NavLink>
+              ))}
+            </nav>
+          </div>
 
-        <div className="hidden items-center gap-2 md:flex">
-          {anonimo ? (
-            <>
-              <Link to={RUTAS.login} className={clasesBoton('fantasma')}>
-                Ingresar
-              </Link>
-              <Link to={RUTAS.registro} className={clasesBoton('primario')}>
-                Registrarse
-              </Link>
-            </>
-          ) : (
-            <MenuUsuario />
-          )}
-        </div>
-
-        <button
-          type="button"
-          aria-label={menuAbierto ? 'Cerrar menú' : 'Abrir menú'}
-          aria-expanded={menuAbierto}
-          aria-controls="menu-movil"
-          onClick={() => setMenuAbierto((v) => !v)}
-          className="grid size-11 place-items-center rounded-lg hover:bg-tinta-800 md:hidden"
-        >
-          {menuAbierto ? <IconoCerrar /> : <IconoMenu />}
-        </button>
-      </div>
-
-      {menuAbierto && (
-        <div id="menu-movil" className="border-t border-borde px-4 pb-4 md:hidden">
-          <nav aria-label="Principal móvil" className="flex flex-col py-2">
-            {visibles.map((e) => (
-              <NavLink key={e.to} to={e.to} className={claseEnlace} onClick={cerrarMenu}>
-                {e.texto}
-              </NavLink>
-            ))}
-          </nav>
-          <div className="border-t border-borde pt-4">
-            {anonimo ? (
-              <div className="flex gap-3">
-                <Link to={RUTAS.login} className={clasesBoton('secundario')} onClick={cerrarMenu}>
+          <div className="hidden items-center gap-2 md:flex">
+            {isGuest ? (
+              <>
+                <Link to={ROUTES.login} className={buttonClasses('ghost')}>
                   Ingresar
                 </Link>
-                <Link to={RUTAS.registro} className={clasesBoton('primario')} onClick={cerrarMenu}>
+                <Link to={ROUTES.register} className={buttonClasses('primary')}>
                   Registrarse
                 </Link>
-              </div>
+              </>
             ) : (
-              <MenuUsuario />
+              <UserMenu />
             )}
           </div>
+
+          <button
+            type="button"
+            aria-label={menuOpen ? 'Cerrar menú' : 'Abrir menú'}
+            aria-expanded={menuOpen}
+            aria-controls="mobile-menu"
+            onClick={() => setMenuOpen((v) => !v)}
+            className="grid size-11 place-items-center rounded-full hover:bg-ink-800 md:hidden"
+          >
+            {menuOpen ? <IconClose /> : <IconMenu />}
+          </button>
         </div>
-      )}
+
+        {menuOpen && (
+          <div id="mobile-menu" className="border-t border-line px-4 pb-4 md:hidden">
+            <nav aria-label="Principal móvil" className="flex flex-col gap-1 py-3">
+              {visible.map((item) => (
+                <NavLink key={item.to} to={item.to} className={linkClass} onClick={closeMenu}>
+                  {item.label}
+                </NavLink>
+              ))}
+            </nav>
+            <div className="border-t border-line pt-4">
+              {isGuest ? (
+                <div className="flex gap-3">
+                  <Link to={ROUTES.login} className={buttonClasses('secondary')} onClick={closeMenu}>
+                    Ingresar
+                  </Link>
+                  <Link to={ROUTES.register} className={buttonClasses('primary')} onClick={closeMenu}>
+                    Registrarse
+                  </Link>
+                </div>
+              ) : (
+                <UserMenu />
+              )}
+            </div>
+          </div>
+        )}
+      </div>
     </header>
   )
 }
