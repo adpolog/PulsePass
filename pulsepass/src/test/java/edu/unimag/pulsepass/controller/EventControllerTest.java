@@ -66,7 +66,8 @@ class EventControllerTest {
 
     private EventSummaryResponse summary(String code, EventStatus status) {
         return new EventSummaryResponse(code, "Evento " + code, status,
-                LocalDateTime.now().plusDays(10), "Marina Convention Center");
+                LocalDateTime.now().plusDays(10), "Marina Convention Center",
+                EventCategory.MUSIC, "Santa Marta");
     }
 
     private CreateEventRequest validCreateRequest() {

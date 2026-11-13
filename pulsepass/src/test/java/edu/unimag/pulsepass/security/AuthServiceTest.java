@@ -134,7 +134,7 @@ class AuthServiceTest {
     @DisplayName("AUTH-SVC-005: Registro guarda hash BCrypt (nunca el texto plano) y rol USER")
     void register_Valid_SavesHashedCredentialAndUserRole() {
         RegisterUserRequest request = registerRequest();
-        UserResponse created = new UserResponse(1L, "andrea", "andrea@test.com", "Andrea", "Perez", true);
+        UserResponse created = new UserResponse(1L, "andrea", "andrea@test.com", "Andrea", "Perez", true, LocalDate.of(1998, 4, 12));
         User userRef = new User();
         userRef.setId(1L);
 

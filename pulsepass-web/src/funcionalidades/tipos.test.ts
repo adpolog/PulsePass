@@ -47,6 +47,7 @@ describe('TicketResponseSchema', () => {
       userEmail: 'andrea@pulsepass.test',
       eventCode: 'CMF-2026',
       eventName: 'Caribbean Music Fest 2026',
+      holderName: 'Andrea Ruiz',
     })
     expect(ticket.price).toBe(250000)
   })

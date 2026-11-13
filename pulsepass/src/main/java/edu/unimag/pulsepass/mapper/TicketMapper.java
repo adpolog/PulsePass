@@ -4,6 +4,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.ReportingPolicy;
 import edu.unimag.pulsepass.domain.Ticket;
+import edu.unimag.pulsepass.domain.UserProfile;
 import edu.unimag.pulsepass.dto.response.TicketResponse;
 
 @Mapper(
@@ -15,5 +16,10 @@ public interface TicketMapper {
     @Mapping(target = "userEmail", source = "user.email")
     @Mapping(target = "eventCode", source = "event.eventCode")
     @Mapping(target = "eventName", source = "event.name")
+    @Mapping(target = "holderName", source = "user.userProfile")
     TicketResponse toResponse(Ticket ticket);
+
+    default String holderName(UserProfile profile) {
+        return profile == null ? null : profile.getFirstName() + " " + profile.getLastName();
+    }
 }

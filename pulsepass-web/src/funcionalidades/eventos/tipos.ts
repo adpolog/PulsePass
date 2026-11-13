@@ -2,7 +2,6 @@ import { z } from 'zod'
 import { FechaHoraLocalSchema, listaSegura } from '../../lib/esquemas'
 import { ArtistResponseSchema } from '../artistas/tipos'
 
-// ─── Enumeraciones (PRD §10.1) ───────────────────────────────────────────────
 
 export const EventCategorySchema = z.enum([
   'MUSIC',
@@ -17,9 +16,6 @@ export type EventCategory = z.infer<typeof EventCategorySchema>
 export const EventStatusSchema = z.enum(['DRAFT', 'PUBLISHED', 'SOLD_OUT', 'CANCELLED', 'FINISHED'])
 export type EventStatus = z.infer<typeof EventStatusSchema>
 
-// ─── Respuestas ──────────────────────────────────────────────────────────────
-
-/** EventResponse (backend: dto/response/EventResponse.java). */
 export const EventResponseSchema = z.object({
   id: z.number().int(),
   eventCode: z.string(),
@@ -35,28 +31,21 @@ export const EventResponseSchema = z.object({
 })
 export type EventResponse = z.infer<typeof EventResponseSchema>
 
-/**
- * EventSummaryResponse (backend: dto/response/EventSummaryResponse.java).
- * Nota de contrato: NO incluye `category` ni ciudad; solo `venueName`.
- */
+
 export const EventSummaryResponseSchema = z.object({
   eventCode: z.string(),
   name: z.string(),
   status: EventStatusSchema,
   eventDate: FechaHoraLocalSchema,
   venueName: z.string().nullable(),
+  category: EventCategorySchema,
+  venueCity: z.string().nullable(),
 })
 export type EventSummaryResponse = z.infer<typeof EventSummaryResponseSchema>
 
 export const ListaEventosResumenSchema = z.array(EventSummaryResponseSchema)
 
-// ─── Solicitudes ─────────────────────────────────────────────────────────────
 
-/**
- * CreateEventRequest — límites tomados de las anotaciones del backend.
- * `eventDate` llega desde <input type="datetime-local"> ("2026-12-12T20:00"),
- * formato que el LocalDateTime de Jackson acepta.
- */
 export const CreateEventRequestSchema = z.object({
   eventCode: z
     .string()

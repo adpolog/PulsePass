@@ -77,7 +77,7 @@ class TicketServiceImplTest {
         Ticket ticket = new Ticket();
         TicketResponse response = new TicketResponse(1L, "TCK-01", TicketType.GENERAL,
                 new BigDecimal("100.00"), TicketStatus.PAID, LocalDateTime.now(),
-                "user@email.com", "CMF-2026", "Music Fest");
+                "user@email.com", "CMF-2026", "Music Fest", "Ana Gomez");
 
         when(userRepository.findByEmailIgnoreCase("user@email.com")).thenReturn(Optional.of(user));
         when(eventRepository.findByEventCode("CMF-2026")).thenReturn(Optional.of(event));
@@ -170,7 +170,7 @@ class TicketServiceImplTest {
         Ticket ticket = new Ticket();
         TicketResponse response = new TicketResponse(1L, "TCK-01", TicketType.GENERAL,
                 new BigDecimal("100.00"), TicketStatus.PAID, LocalDateTime.now(),
-                "user@email.com", "CMF-2026", "Music Fest");
+                "user@email.com", "CMF-2026", "Music Fest", "Ana Gomez");
 
         when(userRepository.findByEmailIgnoreCase("user@email.com")).thenReturn(Optional.of(user));
         when(eventRepository.findByEventCode("CMF-2026")).thenReturn(Optional.of(event));
@@ -193,7 +193,7 @@ class TicketServiceImplTest {
 
         TicketResponse response = new TicketResponse(1L, "TCK-01", TicketType.GENERAL,
                 new BigDecimal("100.00"), TicketStatus.CANCELLED, LocalDateTime.now(),
-                "user@email.com", "CMF-2026", "Music Fest");
+                "user@email.com", "CMF-2026", "Music Fest", "Ana Gomez");
 
         when(ticketRepository.findByTicketCode("TCK-01")).thenReturn(Optional.of(ticket));
         when(ticketRepository.save(ticket)).thenReturn(ticket);
@@ -225,7 +225,7 @@ class TicketServiceImplTest {
 
         TicketResponse response = new TicketResponse(1L, "TCK-01", TicketType.GENERAL,
                 new BigDecimal("100.00"), TicketStatus.USED, LocalDateTime.now(),
-                "user@email.com", "CMF-2026", "Music Fest");
+                "user@email.com", "CMF-2026", "Music Fest", "Ana Gomez");
 
         when(ticketRepository.findByTicketCode("TCK-01")).thenReturn(Optional.of(ticket));
         when(ticketRepository.save(ticket)).thenReturn(ticket);

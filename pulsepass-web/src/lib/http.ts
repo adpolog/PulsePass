@@ -1,16 +1,6 @@
 import { z } from 'zod'
 
-/**
- * Cliente HTTP base de PulsePass (PRD §5, §12.2, §13).
- *
- *  - fetch nativo, sin Axios.
- *  - El token viaja SOLO en `Authorization: Bearer <token>` (FE-013); nunca en la URL ni en consola.
- *  - Toda respuesta no exitosa se convierte en `ApiError` validando `ErrorResponse` con zod.
- *  - Toda respuesta exitosa se valida con el esquema zod que entrega el `api.ts` de cada funcionalidad.
- *  - Un 401 en una petición que llevaba token se interpreta como sesión expirada y notifica a AuthContext.
- */
 
-// ─── Contrato de error del backend (Fase 3) ──────────────────────────────────
 
 export const ErrorResponseSchema = z.object({
   // LocalDateTime: no se usa en la UI, se acepta sin imponer formato.
@@ -25,13 +15,7 @@ export const ErrorResponseSchema = z.object({
 })
 export type ErrorResponse = z.infer<typeof ErrorResponseSchema>
 
-// ─── ApiError ────────────────────────────────────────────────────────────────
 
-/**
- * - `red`:      no hubo respuesta (servidor caído, sin conexión). `status = 0`.
- * - `http`:     el servidor respondió con un código ≠ 2xx.
- * - `contrato`: respuesta 2xx cuyo cuerpo no cumple el esquema esperado.
- */
 export type TipoApiError = 'red' | 'http' | 'contrato'
 
 export const MENSAJE_RED = 'No pudimos conectar con el servidor.'
@@ -60,25 +44,19 @@ export function esApiError(error: unknown): error is ApiError {
   return error instanceof ApiError
 }
 
-// ─── Integración con la sesión (la registra AuthContext) ─────────────────────
 
-interface ConfiguracionHttp {
-  /** Devuelve el token vigente o `null` si no hay sesión. */
-  obtenerToken: () => string | null
-  /** Se invoca cuando una petición autenticada recibe 401 (token vencido o manipulado). */
-  alNoAutorizado: () => void
+// Token en memoria y aviso de 401: los actualiza AuthContext.
+let tokenActual: string | null = null
+let alNoAutorizado: () => void = () => {}
+
+export function establecerToken(token: string | null): void {
+  tokenActual = token
 }
 
-let configuracion: ConfiguracionHttp = {
-  obtenerToken: () => null,
-  alNoAutorizado: () => {},
+export function alRecibirNoAutorizado(manejador: () => void): void {
+  alNoAutorizado = manejador
 }
 
-export function configurarHttp(nueva: ConfiguracionHttp): void {
-  configuracion = nueva
-}
-
-// ─── Petición base ───────────────────────────────────────────────────────────
 
 const URL_BASE: string = import.meta.env.VITE_API_BASE_URL ?? '/api'
 
@@ -126,7 +104,7 @@ export async function peticion<T>(
   esquema: z.ZodType<T>,
   { metodo = 'GET', cuerpo, params, signal }: OpcionesPeticion = {},
 ): Promise<T> {
-  const token = configuracion.obtenerToken()
+  const token = tokenActual
 
   const encabezados = new Headers({ Accept: 'application/json' })
   if (cuerpo !== undefined) encabezados.set('Content-Type', 'application/json')
@@ -148,7 +126,7 @@ export async function peticion<T>(
 
   if (!respuesta.ok) {
     // 401 con token enviado = sesión expirada. El 401 del login (sin token) lo maneja la pantalla.
-    if (respuesta.status === 401 && token) configuracion.alNoAutorizado()
+    if (respuesta.status === 401 && token) alNoAutorizado()
     throw await aApiError(respuesta)
   }
 
@@ -159,7 +137,6 @@ export async function peticion<T>(
   return resultado.data
 }
 
-// ─── Atajos por método ───────────────────────────────────────────────────────
 
 type OpcionesSinMetodo = Omit<OpcionesPeticion, 'metodo' | 'cuerpo'>
 

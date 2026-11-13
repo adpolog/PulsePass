@@ -1,10 +1,6 @@
 import type { ComponentProps } from 'react'
 
-/**
- * Íconos SVG de trazo (DES-01). Decorativos por defecto (`aria-hidden`);
- * el texto accesible lo aporta el elemento que los contiene.
- * Se añadirán más íconos a medida que las páginas los necesiten.
- */
+
 type PropsIcono = ComponentProps<'svg'>
 
 function Svg({ className = 'size-5', children, ...props }: PropsIcono) {
@@ -72,6 +68,32 @@ export function IconoGiro(props: PropsIcono) {
   return (
     <Svg {...props}>
       <path d="M21 12a9 9 0 1 1-6.2-8.6" />
+    </Svg>
+  )
+}
+
+export function IconoMusica(props: PropsIcono) {
+  return (
+    <Svg {...props}>
+      <path d="M9 18V5l12-2v13" />
+      <circle cx="6" cy="18" r="3" />
+      <circle cx="18" cy="16" r="3" />
+    </Svg>
+  )
+}
+
+export function IconoMenu(props: PropsIcono) {
+  return (
+    <Svg {...props}>
+      <path d="M4 6h16M4 12h16M4 18h16" />
+    </Svg>
+  )
+}
+
+export function IconoChevronAbajo(props: PropsIcono) {
+  return (
+    <Svg {...props}>
+      <path d="m6 9 6 6 6-6" />
     </Svg>
   )
 }
