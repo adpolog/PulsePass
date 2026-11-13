@@ -1,0 +1,91 @@
+@import "tailwindcss";
+
+/*
+ * PulsePass — Sistema visual "Neón" (variación de PRD §9.1)
+ * ----------------------------------------------------------
+ * Sustituye la marca índigo / acento rosa / slate por:
+ *   · neon-*   → verde neón: acciones primarias, foco, íconos destacados, estados positivos.
+ *   · tinta-*  → escala de negros y grises oscuros: fondos, superficies, bordes.
+ *   · blanco   → texto principal.
+ *
+ * Tokens semánticos (fondo, superficie, texto, primario…) apuntan a las escalas
+ * para que los componentes usen nombres de intención y no valores crudos:
+ *   bg-fondo · bg-superficie · border-borde · text-texto · text-texto-suave
+ *   bg-primario hover:bg-primario-hover text-sobre-primario · outline-foco
+ *
+ * Los colores semánticos de error (red), advertencia (amber) e información (sky)
+ * se mantienen de la paleta de Tailwind porque comunican estado, no marca.
+ */
+@theme {
+  /* ── Verde neón ─────────────────────────────────────────── */
+  --color-neon-50: #efffe9;
+  --color-neon-100: #d9ffcc;
+  --color-neon-200: #b3ff9c;
+  --color-neon-300: #7dff5c;
+  --color-neon-400: #39ff14; /* neón puro: acción primaria */
+  --color-neon-500: #2fe60d; /* hover */
+  --color-neon-600: #22b80a;
+  --color-neon-700: #1a8a0b;
+  --color-neon-800: #156b0d;
+  --color-neon-900: #0f4a0b;
+  --color-neon-950: #052a04; /* fondos tintados (badges, avisos de éxito) */
+
+  /* ── Negros / grises oscuros ────────────────────────────── */
+  --color-tinta-950: #000000; /* fondo de página */
+  --color-tinta-900: #0a0a0a; /* superficie (tarjeta) */
+  --color-tinta-850: #111111; /* superficie elevada (modal, menú) */
+  --color-tinta-800: #181818; /* campos de formulario, esqueletos */
+  --color-tinta-700: #262626; /* bordes */
+  --color-tinta-600: #3a3a3a; /* bordes con hover, separadores fuertes */
+  --color-tinta-500: #6b6b6b; /* texto deshabilitado */
+  --color-tinta-400: #a3a3a3; /* texto secundario (AA sobre negro) */
+  --color-tinta-300: #d4d4d4;
+
+  /* ── Tokens semánticos ──────────────────────────────────── */
+  --color-fondo: var(--color-tinta-950);
+  --color-superficie: var(--color-tinta-900);
+  --color-superficie-elevada: var(--color-tinta-850);
+  --color-campo: var(--color-tinta-800);
+  --color-borde: var(--color-tinta-700);
+  --color-borde-fuerte: var(--color-tinta-600);
+  --color-texto: #ffffff;
+  --color-texto-suave: var(--color-tinta-400);
+  --color-texto-deshabilitado: var(--color-tinta-500);
+  --color-primario: var(--color-neon-400);
+  --color-primario-hover: var(--color-neon-500);
+  --color-sobre-primario: var(--color-tinta-950); /* texto negro sobre neón */
+  --color-foco: var(--color-neon-400);
+
+  /* ── Tipografía (sin cambios respecto al PRD) ───────────── */
+  --font-titulo: "Poppins", ui-sans-serif, system-ui, sans-serif;
+  --font-cuerpo: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  /* ── Brillo neón (sombras) ──────────────────────────────── */
+  --shadow-neon: 0 0 0 1px rgb(57 255 20 / 0.45), 0 0 18px rgb(57 255 20 / 0.25);
+  --shadow-neon-sm: 0 0 10px rgb(57 255 20 / 0.3);
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-fondo font-cuerpo text-texto antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply font-titulo;
+  }
+
+  ::selection {
+    @apply bg-neon-400 text-tinta-950;
+  }
+
+  /* Foco visible global (FE-010); los componentes pueden reforzarlo. */
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-foco;
+  }
+}
