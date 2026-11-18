@@ -1,6 +1,7 @@
 import type { ArtistResponse } from '../../features/artists/types'
 import type { EventResponse, EventSummaryResponse } from '../../features/events/types'
 import type { TicketResponse } from '../../features/tickets/types'
+import type { UserResponse } from '../../features/users/types'
 import type { VenueResponse } from '../../features/venues/types'
 
 // Reference scenario from PRD §22.
@@ -75,4 +76,16 @@ export const ticket: TicketResponse = {
   eventCode: 'CMF-2026',
   eventName: 'Caribbean Music Fest 2026',
   holderName: 'Andrea Ruiz',
+}
+
+export const currentUser = { id: 1, username: 'andrea', email: 'andrea@pulsepass.test', roles: ['ROLE_USER'] }
+
+export const userProfile: UserResponse = {
+  id: 1,
+  username: 'andrea',
+  email: 'andrea@pulsepass.test',
+  firstName: 'Andrea',
+  lastName: 'Ruiz',
+  active: true,
+  birthDate: '2000-05-10',
 }

@@ -23,9 +23,14 @@ export function formatPrice(value: number): string {
   return currencyFormat.format(value)
 }
 
+// Date-only values ("2000-05-10") are read as local time, not UTC.
+function toDate(iso: string): Date {
+  return new Date(iso.length === 10 ? `${iso}T00:00:00` : iso)
+}
+
 // "2026-12-12T20:00:00" → "12 dic 2026" (without the "de" Intl adds).
 export function formatDate(iso: string): string {
-  const parts = dateFormat.formatToParts(new Date(iso))
+  const parts = dateFormat.formatToParts(toDate(iso))
   const part = (type: Intl.DateTimeFormatPartTypes) => parts.find((p) => p.type === type)?.value ?? ''
   return `${part('day')} ${part('month').replace('.', '')} ${part('year')}`
 }

@@ -85,7 +85,7 @@ class JwtAuthenticationFilterTest {
         when(principal.isEnabled()).thenReturn(true);
 
 
-        when(userDetailsService.loadUserByUsername("10")).thenReturn(principal);
+        when(userDetailsService.loadPrincipalById(10L)).thenReturn(principal);
 
         jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
 
@@ -102,7 +102,7 @@ class JwtAuthenticationFilterTest {
         when(jwtService.getUserIdFromToken("token-valido")).thenReturn("10");
 
 
-        when(userDetailsService.loadUserByUsername("10")).thenThrow(new UsernameNotFoundException("User not found"));
+        when(userDetailsService.loadPrincipalById(10L)).thenThrow(new UsernameNotFoundException("User not found"));
 
         jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
 

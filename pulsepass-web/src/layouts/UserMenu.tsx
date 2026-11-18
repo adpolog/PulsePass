@@ -1,14 +1,14 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router'
+import { Link } from 'react-router'
 import { IconChevronDown } from '../components/icons'
-import { useAuth } from '../features/auth/hooks'
+import { useAuth, useSignOut } from '../features/auth/hooks'
 import { ROUTES } from '../lib/routes'
 
 const itemClass = 'block w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-ink-800 hover:text-neon-300'
 
 export default function UserMenu() {
-  const { session, hasRole, logout } = useAuth()
-  const navigate = useNavigate()
+  const { session, hasRole } = useAuth()
+  const signOut = useSignOut()
   const [open, setOpen] = useState(false)
 
   if (session.status !== 'authenticated') return null
@@ -16,8 +16,7 @@ export default function UserMenu() {
 
   const handleLogout = () => {
     setOpen(false)
-    logout()
-    navigate(ROUTES.home)
+    void signOut()
   }
 
   return (

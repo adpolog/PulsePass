@@ -1,5 +1,5 @@
 import { http, HttpResponse } from 'msw'
-import { artists, event, publishedEvents, venue } from './data'
+import { artists, currentUser, event, publishedEvents, userProfile, venue } from './data'
 
 export const API = 'http://localhost/api'
 
@@ -25,6 +25,12 @@ export const handlers = [
     const artist = artists.find((a) => a.id === Number(params.id))
     return artist ? HttpResponse.json(artist) : errorBody(404, 'Artist not found')
   }),
+  http.post(`${API}/auth/login`, () =>
+    HttpResponse.json({ accessToken: 'jwt-token', tokenType: 'Bearer', expiresIn: 900 }),
+  ),
+  http.get(`${API}/auth/me`, () => HttpResponse.json(currentUser)),
+  http.get(`${API}/users/by-email`, () => HttpResponse.json(userProfile)),
+  http.post(`${API}/users`, () => HttpResponse.json(userProfile, { status: 201 })),
   http.get(`${API}/venues/active`, () => HttpResponse.json([venue])),
   http.get(`${API}/venues/:code`, ({ params }) =>
     params.code === venue.code ? HttpResponse.json(venue) : errorBody(404, 'Venue not found'),

@@ -1,0 +1,17 @@
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: pulsepass_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: pulsepass
+    ports:
+      - "5432:5432"
+    volumes:
+      - pulsepass_data:/var/lib/postgresql/data
+
+volumes:
+  pulsepass_data:
