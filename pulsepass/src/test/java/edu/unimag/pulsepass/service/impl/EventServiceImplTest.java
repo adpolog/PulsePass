@@ -6,6 +6,7 @@ import edu.unimag.pulsepass.domain.EventStatus;
 import edu.unimag.pulsepass.domain.Venue;
 import edu.unimag.pulsepass.dto.request.CreateEventRequest;
 import edu.unimag.pulsepass.dto.response.EventResponse;
+import edu.unimag.pulsepass.dto.response.EventSummaryResponse;
 import edu.unimag.pulsepass.exception.BusinessRuleException;
 import edu.unimag.pulsepass.exception.ResourceNotFoundException;
 import edu.unimag.pulsepass.mapper.EventMapper;
@@ -20,6 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -177,5 +179,26 @@ class EventServiceImplTest {
                 .isInstanceOf(BusinessRuleException.class);
 
         verify(eventRepository, never()).save(any());
+    }
+
+    @Test
+    void findByArtist_ShouldReturnEventsSortedByDate() {
+        Event later = new Event();
+        later.setEventDate(LocalDateTime.now().plusDays(30));
+        Event sooner = new Event();
+        sooner.setEventDate(LocalDateTime.now().plusDays(5));
+
+        EventSummaryResponse soonerSummary = new EventSummaryResponse("A-1", "Sooner", EventStatus.PUBLISHED,
+                sooner.getEventDate(), "Arena", EventCategory.MUSIC, "Santa Marta");
+        EventSummaryResponse laterSummary = new EventSummaryResponse("B-2", "Later", EventStatus.PUBLISHED,
+                later.getEventDate(), "Arena", EventCategory.MUSIC, "Santa Marta");
+
+        when(eventRepository.findEventsByArtist("Solar Beat")).thenReturn(List.of(later, sooner));
+        when(eventMapper.toSummary(sooner)).thenReturn(soonerSummary);
+        when(eventMapper.toSummary(later)).thenReturn(laterSummary);
+
+        List<EventSummaryResponse> result = eventService.findByArtist("Solar Beat");
+
+        assertThat(result).extracting(EventSummaryResponse::eventCode).containsExactly("A-1", "B-2");
     }
 }

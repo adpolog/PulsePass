@@ -142,7 +142,13 @@ public class TicketServiceImpl implements TicketService {
     @Override
     @Transactional(readOnly = true)
     public List<TicketResponse> findPaidTicketsByEvent(String eventCode) {
-        throw new UnsupportedOperationException("Requires findByEventEventCodeAndStatus method in TicketRepository");
+        if (!eventRepository.existsByEventCode(eventCode)) {
+            throw new ResourceNotFoundException("Event not found: " + eventCode);
+        }
+        return ticketRepository.findByEventEventCodeAndStatusOrderByPurchaseDateAsc(eventCode, TicketStatus.PAID)
+                .stream()
+                .map(ticketMapper::toResponse)
+                .toList();
     }
 
     // Estrategia de precio básica BR-TICKET-009

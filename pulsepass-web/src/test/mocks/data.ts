@@ -78,6 +78,33 @@ export const ticket: TicketResponse = {
   holderName: 'Andrea Ruiz',
 }
 
+// Andrea's tickets (one per status the "Mis tickets" chips filter on).
+export const myTickets: TicketResponse[] = [
+  ticket,
+  {
+    ...ticket,
+    id: 2,
+    ticketCode: 'TKT-5C90E2',
+    type: 'GENERAL',
+    price: 90000,
+    status: 'USED',
+    purchaseDate: '2026-10-12T10:00:00',
+    eventCode: 'JAZZ-2026',
+    eventName: 'Noche de Jazz y Cultura',
+  },
+  {
+    ...ticket,
+    id: 3,
+    ticketCode: 'TKT-77AD13',
+    type: 'STUDENT',
+    price: 60000,
+    status: 'CANCELLED',
+    purchaseDate: '2026-10-01T18:00:00',
+    eventCode: 'TECH-2027',
+    eventName: 'Cumbre Tech Caribe 2027',
+  },
+]
+
 export const currentUser = { id: 1, username: 'andrea', email: 'andrea@pulsepass.test', roles: ['ROLE_USER'] }
 
 export const userProfile: UserResponse = {

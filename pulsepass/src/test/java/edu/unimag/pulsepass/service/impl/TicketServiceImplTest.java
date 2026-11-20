@@ -18,6 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -248,5 +249,50 @@ class TicketServiceImplTest {
                 .isInstanceOf(BusinessRuleException.class);
 
         verify(ticketRepository, never()).save(any());
+    }
+
+    private TicketResponse responseFor(String code, TicketStatus status) {
+        return new TicketResponse(1L, code, TicketType.GENERAL, new BigDecimal("100.00"), status,
+                LocalDateTime.now(), "user@email.com", "CMF-2026", "Music Fest", "Ana Gomez");
+    }
+
+    @Test
+    void findByUserEmail_WhenUserHasSeveralTickets_ShouldReturnAll() {
+        Ticket first = new Ticket();
+        Ticket second = new Ticket();
+
+        when(ticketRepository.findByUserEmailIgnoreCaseOrderByPurchaseDateDesc("user@email.com"))
+                .thenReturn(List.of(first, second));
+        when(ticketMapper.toResponse(first)).thenReturn(responseFor("TCK-01", TicketStatus.PAID));
+        when(ticketMapper.toResponse(second)).thenReturn(responseFor("TCK-02", TicketStatus.USED));
+
+        List<TicketResponse> result = ticketService.findByUserEmail("user@email.com");
+
+        assertThat(result).extracting(TicketResponse::ticketCode).containsExactly("TCK-01", "TCK-02");
+    }
+
+    @Test
+    void findPaidTicketsByEvent_WhenEventExists_ShouldReturnPaidTickets() {
+        Ticket paid = new Ticket();
+
+        when(eventRepository.existsByEventCode("CMF-2026")).thenReturn(true);
+        when(ticketRepository.findByEventEventCodeAndStatusOrderByPurchaseDateAsc("CMF-2026", TicketStatus.PAID))
+                .thenReturn(List.of(paid));
+        when(ticketMapper.toResponse(paid)).thenReturn(responseFor("TCK-01", TicketStatus.PAID));
+
+        List<TicketResponse> result = ticketService.findPaidTicketsByEvent("CMF-2026");
+
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).status()).isEqualTo(TicketStatus.PAID);
+    }
+
+    @Test
+    void findPaidTicketsByEvent_WhenEventDoesNotExist_ShouldThrowNotFound() {
+        when(eventRepository.existsByEventCode("NOPE")).thenReturn(false);
+
+        assertThatThrownBy(() -> ticketService.findPaidTicketsByEvent("NOPE"))
+                .isInstanceOf(ResourceNotFoundException.class);
+
+        verify(ticketRepository, never()).findByEventEventCodeAndStatusOrderByPurchaseDateAsc(any(), any());
     }
 }
