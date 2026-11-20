@@ -19,3 +19,13 @@ export function getTicketsByUser(email: string, signal?: AbortSignal) {
 export function cancelTicket(ticketCode: string) {
   return http.patch(`${ticketPath(ticketCode)}/cancel`, TicketResponseSchema)
 }
+
+// STAFF/ADMIN: check-in at the door.
+export function markTicketUsed(ticketCode: string) {
+  return http.patch(`${ticketPath(ticketCode)}/use`, TicketResponseSchema)
+}
+
+// STAFF/ADMIN: PAID tickets of an event.
+export function getPaidTicketsByEvent(eventCode: string, signal?: AbortSignal) {
+  return http.get(`/events/${encodeURIComponent(eventCode)}/tickets/paid`, TicketListSchema, { signal })
+}

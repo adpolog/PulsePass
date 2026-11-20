@@ -1,5 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { cancelTicket, getTicket, getTicketsByUser, purchaseTicket } from './api'
+import {
+  cancelTicket,
+  getPaidTicketsByEvent,
+  getTicket,
+  getTicketsByUser,
+  markTicketUsed,
+  purchaseTicket,
+} from './api'
 import type { PurchaseTicketRequest, TicketResponse } from './types'
 
 // Query keys in one place so queries and invalidations cannot drift apart (PRD §14.1).
@@ -17,11 +24,38 @@ export function useMyTickets(email: string) {
   })
 }
 
+// With an empty code the query waits (on-demand search in check-in).
 export function useTicket(ticketCode: string) {
   return useQuery({
     queryKey: ticketKeys.detail(ticketCode),
     queryFn: ({ signal }) => getTicket(ticketCode, signal),
+    enabled: ticketCode.length > 0,
     staleTime: 15_000,
+  })
+}
+
+export function usePaidTickets(eventCode: string) {
+  return useQuery({
+    queryKey: ticketKeys.paidByEvent(eventCode),
+    queryFn: ({ signal }) => getPaidTicketsByEvent(eventCode, signal),
+    enabled: eventCode.length > 0,
+    staleTime: 15_000,
+  })
+}
+
+export function useMarkTicketUsed() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (ticketCode: string) => markTicketUsed(ticketCode),
+    onSuccess: (updated) => {
+      queryClient.setQueryData(ticketKeys.detail(updated.ticketCode), updated)
+      void queryClient.invalidateQueries({ queryKey: ticketKeys.paidByEvent(updated.eventCode) })
+      void queryClient.invalidateQueries({ queryKey: ticketKeys.byUser(updated.userEmail) })
+    },
+    // 409 = someone already used it (another door): reload the real state.
+    onError: (_error, ticketCode) => {
+      void queryClient.invalidateQueries({ queryKey: ticketKeys.detail(ticketCode) })
+    },
   })
 }
 

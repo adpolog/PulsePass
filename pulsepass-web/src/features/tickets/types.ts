@@ -35,8 +35,3 @@ export const PurchaseFormSchema = z.object({
   type: TicketTypeSchema,
 })
 export type PurchaseForm = z.infer<typeof PurchaseFormSchema>
-
-export const TicketLookupSchema = z.object({
-  ticketCode: z.string().trim().min(1, 'Ingresa el código del ticket'),
-})
-export type TicketLookup = z.infer<typeof TicketLookupSchema>

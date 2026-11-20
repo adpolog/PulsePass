@@ -105,6 +105,21 @@ export const myTickets: TicketResponse[] = [
   },
 ]
 
+// PAID tickets of CMF-2026 (PRD §22.4: Andrea VIP and Carlos GENERAL).
+export const paidTickets: TicketResponse[] = [
+  ticket,
+  {
+    ...ticket,
+    id: 4,
+    ticketCode: 'TKT-91B07D',
+    type: 'GENERAL',
+    price: 120000,
+    purchaseDate: '2026-11-08T09:15:00',
+    userEmail: 'carlos@pulsepass.test',
+    holderName: 'Carlos Peña',
+  },
+]
+
 export const currentUser = { id: 1, username: 'andrea', email: 'andrea@pulsepass.test', roles: ['ROLE_USER'] }
 
 export const userProfile: UserResponse = {

@@ -1,5 +1,5 @@
 import { http, HttpResponse } from 'msw'
-import { artists, currentUser, event, myTickets, publishedEvents, userProfile, venue } from './data'
+import { artists, currentUser, event, myTickets, paidTickets, publishedEvents, userProfile, venue } from './data'
 
 export const API = 'http://localhost/api'
 
@@ -43,6 +43,15 @@ export const handlers = [
     if (found.status !== 'PAID') return errorBody(409, 'Only tickets in PAID status can be cancelled.')
     return HttpResponse.json({ ...found, status: 'CANCELLED' })
   }),
+  http.patch(`${API}/tickets/:ticketCode/use`, ({ params }) => {
+    const found = [...myTickets, ...paidTickets].find((t) => t.ticketCode === params.ticketCode)
+    if (!found) return errorBody(404, 'Ticket not found.')
+    if (found.status !== 'PAID') return errorBody(409, 'Only tickets in PAID status can be used.')
+    return HttpResponse.json({ ...found, status: 'USED' })
+  }),
+  http.get(`${API}/events/:eventCode/tickets/paid`, ({ params }) =>
+    params.eventCode === event.eventCode ? HttpResponse.json(paidTickets) : errorBody(404, 'Event not found'),
+  ),
   http.get(`${API}/venues/active`, () => HttpResponse.json([venue])),
   http.get(`${API}/venues/:code`, ({ params }) =>
     params.code === venue.code ? HttpResponse.json(venue) : errorBody(404, 'Venue not found'),
