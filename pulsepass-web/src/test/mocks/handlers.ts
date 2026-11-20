@@ -1,5 +1,18 @@
 import { http, HttpResponse } from 'msw'
-import { artists, currentUser, event, myTickets, paidTickets, publishedEvents, userProfile, venue } from './data'
+import {
+  artists,
+  currentUser,
+  draftEvent,
+  event,
+  myTickets,
+  paidTickets,
+  publishedEvents,
+  userProfile,
+  venue,
+} from './data'
+
+const events = [event, draftEvent]
+const findEvent = (code: unknown) => events.find((e) => e.eventCode === code)
 
 export const API = 'http://localhost/api'
 
@@ -17,9 +30,31 @@ export const handlers = [
     const stageName = new URL(request.url).searchParams.get('stageName')
     return HttpResponse.json(stageName === 'Solar Beat' ? [publishedEvents[0]] : [])
   }),
-  http.get(`${API}/events/:eventCode`, ({ params }) =>
-    params.eventCode === event.eventCode ? HttpResponse.json(event) : errorBody(404, 'Event not found'),
-  ),
+  http.get(`${API}/events/:eventCode`, ({ params }) => {
+    const found = findEvent(params.eventCode)
+    return found ? HttpResponse.json(found) : errorBody(404, 'Event not found')
+  }),
+  http.post(`${API}/events`, async ({ request }) => {
+    const body = (await request.json()) as Record<string, unknown>
+    if (findEvent(body.eventCode)) return errorBody(409, 'Event code already exists.')
+    return HttpResponse.json(
+      { ...draftEvent, ...body, id: 99, status: 'DRAFT', venueName: venue.name, artists: [] },
+      { status: 201 },
+    )
+  }),
+  http.patch(`${API}/events/:eventCode/publish`, ({ params }) => {
+    const found = findEvent(params.eventCode)
+    if (!found) return errorBody(404, 'Evento no encontrado.')
+    if (found.status !== 'DRAFT') return errorBody(409, 'Solo se puede publicar un evento en estado DRAFT.')
+    return HttpResponse.json({ ...found, status: 'PUBLISHED' })
+  }),
+  http.post(`${API}/events/:eventCode/artists/:artistId`, ({ params }) => {
+    const found = findEvent(params.eventCode)
+    const artist = artists.find((a) => a.id === Number(params.artistId))
+    if (!found || !artist) return errorBody(404, 'Evento no encontrado.')
+    if (found.artists.some((a) => a.id === artist.id)) return errorBody(409, 'El artista ya está asociado al evento.')
+    return HttpResponse.json({ ...found, artists: [...found.artists, artist] })
+  }),
   http.get(`${API}/artists/active`, () => HttpResponse.json(artists)),
   http.get(`${API}/artists/:id`, ({ params }) => {
     const artist = artists.find((a) => a.id === Number(params.id))

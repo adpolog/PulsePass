@@ -52,7 +52,7 @@ public class EventServiceImpl implements EventService {
         }
 
         if (request.eventDate().isBefore(LocalDateTime.now())) {
-            throw new BusinessRuleException("Event date must be in the future.."); // BR-EVENT-004
+            throw new BusinessRuleException("Event date must be in the future."); // BR-EVENT-004
         }
 
         if (request.minimumAge() < 0) {

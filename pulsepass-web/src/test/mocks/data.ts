@@ -35,6 +35,20 @@ export const event: EventResponse = {
   artists: [artists[0]!, artists[1]!],
 }
 
+// A DRAFT event for the admin screens (only STAFF/ADMIN can read it).
+export const draftEvent: EventResponse = {
+  ...event,
+  id: 2,
+  eventCode: 'EDU-2027',
+  name: 'Taller de Producción Musical',
+  description: 'Aprende a producir tu primer track desde cero.',
+  category: 'EDUCATION',
+  status: 'DRAFT',
+  eventDate: '2027-04-10T10:00:00',
+  minimumAge: 14,
+  artists: [artists[0]!],
+}
+
 export const publishedEvents: EventSummaryResponse[] = [
   {
     eventCode: 'CMF-2026',
