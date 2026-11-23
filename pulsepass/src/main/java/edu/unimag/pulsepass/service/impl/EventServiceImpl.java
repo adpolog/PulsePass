@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -51,11 +52,11 @@ public class EventServiceImpl implements EventService {
         }
 
         if (request.eventDate().isBefore(LocalDateTime.now())) {
-            throw new BusinessRuleException("Minimum age must be greater than or equal to 0."); // BR-EVENT-004
+            throw new BusinessRuleException("Event date must be in the future."); // BR-EVENT-004
         }
 
         if (request.minimumAge() < 0) {
-            throw new BusinessRuleException("Event date must be in the future."); // BR-EVENT-006
+            throw new BusinessRuleException("Minimum age must be greater than or equal to 0."); // BR-EVENT-006
         }
 
         Event event = new Event();
@@ -135,6 +136,10 @@ public class EventServiceImpl implements EventService {
     @Override
     @Transactional(readOnly = true)
     public List<EventSummaryResponse> findByArtist(String stageName) {
-        throw new UnsupportedOperationException("Requiere implementación de query en EventRepository");
+        return eventRepository.findEventsByArtist(stageName)
+                .stream()
+                .sorted(Comparator.comparing(Event::getEventDate))
+                .map(eventMapper::toSummary)
+                .toList();
     }
 }

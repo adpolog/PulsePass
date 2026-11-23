@@ -19,5 +19,6 @@ public interface EventMapper {
     EventResponse toResponse(Event event);
 
     @Mapping(target = "venueName", source = "venue.name")
+    @Mapping(target = "venueCity", source = "venue.city")
     EventSummaryResponse toSummary(Event event);
 }

@@ -74,7 +74,7 @@ class TicketControllerTest {
     private TicketResponse ticket(TicketStatus status) {
         return new TicketResponse(1L, "TKT-001", TicketType.VIP, new BigDecimal("150.00"),
                 status, LocalDateTime.now(), "andrea@test.com", "CMF-2026",
-                "Caribbean Music Fest 2026");
+                "Caribbean Music Fest 2026", "Andrea Perez");
     }
 
     private PurchaseTicketRequest purchaseRequest(String email) {

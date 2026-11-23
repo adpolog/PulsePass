@@ -38,7 +38,7 @@ class UserServiceImplTest {
                 "12345", "Santa Marta", LocalDate.of(2000, 1, 1), "Password1234!");
 
         User user = new User();
-        UserResponse response = new UserResponse(1L, "andrea", "andrea@email.com", "Andrea", "Perez", true);
+        UserResponse response = new UserResponse(1L, "andrea", "andrea@email.com", "Andrea", "Perez", true, LocalDate.of(1998, 4, 12));
 
         when(userRepository.existsByUsername("andrea")).thenReturn(false);
         when(userRepository.existsByEmailIgnoreCase("andrea@email.com")).thenReturn(false);

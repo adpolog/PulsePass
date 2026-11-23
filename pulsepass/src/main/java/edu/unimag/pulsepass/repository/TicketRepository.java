@@ -16,5 +16,8 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
 
     @Query("SELECT COUNT(t) FROM Ticket t WHERE t.event.eventCode = :eventCode AND t.status = :status")
     long countTicketsByEventCodeAndStatus(@Param("eventCode") String eventCode, @Param("status") TicketStatus status);
-    Optional<Ticket> findByUserEmailIgnoreCaseOrderByPurchaseDateDesc(String email);
+
+    List<Ticket> findByUserEmailIgnoreCaseOrderByPurchaseDateDesc(String email);
+
+    List<Ticket> findByEventEventCodeAndStatusOrderByPurchaseDateAsc(String eventCode, TicketStatus status);
 }

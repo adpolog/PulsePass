@@ -71,7 +71,7 @@ class UserControllerTest {
     }
 
     private UserResponse andreaResponse() {
-        return new UserResponse(1L, "andrea", "andrea@test.com", "Andrea", "Perez", true);
+        return new UserResponse(1L, "andrea", "andrea@test.com", "Andrea", "Perez", true, LocalDate.of(1998, 4, 12));
     }
 
 

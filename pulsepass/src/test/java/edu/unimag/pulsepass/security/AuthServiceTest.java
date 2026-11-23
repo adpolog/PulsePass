@@ -13,7 +13,7 @@ import edu.unimag.pulsepass.exception.DuplicateResourceException;
 import edu.unimag.pulsepass.repository.UserCredentialRepository;
 import edu.unimag.pulsepass.repository.UserRepository;
 import edu.unimag.pulsepass.repository.UserRoleRepository;
-import edu.unimag.pulsepass.service.AuthService;
+import edu.unimag.pulsepass.service.impl.AuthServiceImpl;
 import edu.unimag.pulsepass.service.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -52,8 +52,9 @@ class AuthServiceTest {
     @Mock private UserRoleRepository roleRepository;
     @Mock private PasswordEncoder passwordEncoder;
 
+    // Mockito needs the concrete class: it cannot instantiate the AuthService interface.
     @InjectMocks
-    private AuthService authService;
+    private AuthServiceImpl authService;
 
     private static final String PASSWORD = "Password123!";
 
@@ -104,8 +105,10 @@ class AuthServiceTest {
         when(authenticationManager.authenticate(any(Authentication.class)))
                 .thenThrow(new DisabledException("User is disabled"));
 
+        // H-20: a disabled account answers exactly like a wrong password (same exception, same message).
         assertThatThrownBy(() -> authService.login(new LoginRequest("andrea", PASSWORD)))
-                .isInstanceOf(DisabledException.class);
+                .isInstanceOf(BadCredentialsException.class)
+                .hasMessage("Invalid credentials");
 
         verifyNoInteractions(jwtService);
     }
@@ -134,7 +137,7 @@ class AuthServiceTest {
     @DisplayName("AUTH-SVC-005: Registro guarda hash BCrypt (nunca el texto plano) y rol USER")
     void register_Valid_SavesHashedCredentialAndUserRole() {
         RegisterUserRequest request = registerRequest();
-        UserResponse created = new UserResponse(1L, "andrea", "andrea@test.com", "Andrea", "Perez", true);
+        UserResponse created = new UserResponse(1L, "andrea", "andrea@test.com", "Andrea", "Perez", true, LocalDate.of(1998, 4, 12));
         User userRef = new User();
         userRef.setId(1L);
 

@@ -1,6 +1,6 @@
-INSERT INTO artists (stage_name, country, genre, active) VALUES
-                                                             ('Solar Beat', 'Colombia', 'Electronic', TRUE),
-                                                             ('Neon Waves', 'United States', 'Synthwave', TRUE),
-                                                             ('Caribbean Sound', 'Colombia', 'Tropical', TRUE),
-                                                             ('Ocean Drive', 'Spain', 'Pop Rock', TRUE),
-                                                             ('Digital Pulse', 'Mexico', 'Techno', TRUE);
+INSERT INTO artists (id,stage_name, country, genre, active) VALUES
+                                                             (1,'Solar Beat', 'Colombia', 'Electronic', TRUE),
+                                                             (2,'Neon Waves', 'United States', 'Synthwave', TRUE),
+                                                             (3,'Caribbean Sound', 'Colombia', 'Tropical', TRUE),
+                                                             (4,'Ocean Drive', 'Spain', 'Pop Rock', TRUE),
+                                                             (5,'Digital Pulse', 'Mexico', 'Techno', TRUE);

@@ -78,15 +78,12 @@ public class AuthorizationService {
         return ticket.getUser().getId().equals(principal.getUserId());
     }
 
+    // Anti-IDOR (PRD Seguridad 11.1): a ticket can only be bought for the authenticated user's own email.
+    // Unlike the other ownership rules, there is no ADMIN exception: nobody buys on behalf of someone else.
     public boolean canPurchaseTicket(String userEmail, SecurityPrincipal principal) {
         if (principal == null || userEmail == null) {
             return false;
         }
-
-        if (hasRole(principal, Role.ADMIN)) {
-            return true;
-        }
-
         return principal.getEmail().equalsIgnoreCase(userEmail);
     }
 
