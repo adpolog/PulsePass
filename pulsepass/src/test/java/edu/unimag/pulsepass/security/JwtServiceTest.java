@@ -6,7 +6,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import io.jsonwebtoken.JwtBuilder;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
+
 import java.time.Duration;
+import java.time.Instant;
+import java.util.Date;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
@@ -105,5 +114,55 @@ class JwtServiceTest {
         String manipulatedToken = token.substring(0, token.length() - 2) + "xx";
 
         assertFalse(jwtService.validateToken(manipulatedToken));
+    }
+
+    // Tokens signed with the same key as the service, so only the claims under test differ.
+    private JwtBuilder signedToken() {
+        Instant now = Instant.now();
+        return Jwts.builder()
+                .subject("10")
+                .issuer("pulsepass-api")
+                .issuedAt(Date.from(now))
+                .id(UUID.randomUUID().toString())
+                .signWith(Keys.hmacShaKeyFor(Decoders.BASE64.decode(validSecretBase64)), Jwts.SIG.HS256);
+    }
+
+    @Test
+    void validateToken_WhenAllClaimsAreValid_ShouldReturnTrue() {
+        String token = signedToken().expiration(Date.from(Instant.now().plusSeconds(600))).compact();
+
+        assertTrue(jwtService.validateToken(token));
+    }
+
+    @Test
+    void validateToken_WhenTokenIsExpired_ShouldReturnFalse() {
+        String token = signedToken().expiration(Date.from(Instant.now().minusSeconds(60))).compact();
+
+        assertFalse(jwtService.validateToken(token));
+    }
+
+    @Test
+    void validateToken_WhenIssuerIsWrong_ShouldReturnFalse() {
+        String token = signedToken()
+                .issuer("another-api")
+                .expiration(Date.from(Instant.now().plusSeconds(600)))
+                .compact();
+
+        assertFalse(jwtService.validateToken(token));
+    }
+
+    @Test
+    void validateToken_WhenExpirationIsMissing_ShouldReturnFalse() {
+        // H-17: a token without 'exp' must not be accepted as a never-expiring session.
+        String token = signedToken().compact();
+
+        assertFalse(jwtService.validateToken(token));
+    }
+
+    @Test
+    void getUserIdFromToken_WhenExpirationIsMissing_ShouldThrow() {
+        String token = signedToken().compact();
+
+        assertThrows(JwtException.class, () -> jwtService.getUserIdFromToken(token));
     }
 }

@@ -24,7 +24,8 @@ public class JwtService {
     @PostConstruct
     public void init() {
         if (jwtProperties.getSecretBase64() == null || jwtProperties.getSecretBase64().isBlank()) {
-            throw new IllegalStateException("Property pulsepass.security.jwt.secret-base64 is not configured.");
+            throw new IllegalStateException("JWT signing key is not configured: set the PULSEPASS_JWT_SECRET_BASE64 "
+                    + "environment variable or create pulsepass/.env from .env.example.");
         }
         byte[] keyBytes = Decoders.BASE64.decode(jwtProperties.getSecretBase64());
         if (keyBytes.length < 32) {
@@ -62,11 +63,18 @@ public class JwtService {
     }
 
     private Claims parseClaims(String token) {
-        return Jwts.parser()
+        Claims claims = Jwts.parser()
                 .verifyWith(secretKey)
                 .requireIssuer(jwtProperties.getIssuer())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
+
+        // JJWT rejects an expired 'exp' but accepts a token that has no 'exp' at all,
+        // which would never expire. The PRD requires 'exp' on every token (Seguridad 12.1).
+        if (claims.getExpiration() == null) {
+            throw new JwtException("Token has no expiration (exp) claim.");
+        }
+        return claims;
     }
 }

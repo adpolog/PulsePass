@@ -19,6 +19,8 @@ import edu.unimag.pulsepass.service.AuthService;
 import edu.unimag.pulsepass.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -45,9 +47,16 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthResponse login(LoginRequest request) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.identifier(), request.password())
-        );
+        Authentication authentication;
+        try {
+            authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.identifier(), request.password())
+            );
+        } catch (AuthenticationException ex) {
+            // FR-SEC-AUTH-003: one generic 401 for every login failure. A disabled or locked account
+            // must not answer differently from a wrong password, or it reveals that the password was right.
+            throw new BadCredentialsException("Invalid credentials", ex);
+        }
 
         SecurityPrincipal principal = (SecurityPrincipal) authentication.getPrincipal();
         String token = jwtService.generateToken(principal);

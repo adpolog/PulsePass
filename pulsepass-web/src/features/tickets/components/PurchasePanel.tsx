@@ -27,7 +27,8 @@ export default function PurchasePanel({ event }: { event: EventResponse }) {
   })
   const selectedType = useWatch({ control, name: 'type' })
 
-  // STAFF and ADMIN do not buy from the UI (the API only allows USER).
+  // STAFF and ADMIN do not buy from the UI (PRD 12.4). UX only: the API itself only lets
+  // anyone buy with their own email (canPurchaseTicket), never on behalf of someone else.
   if (hasRole('STAFF', 'ADMIN') && !hasRole('USER')) return null
 
   const available = event.status === 'PUBLISHED'

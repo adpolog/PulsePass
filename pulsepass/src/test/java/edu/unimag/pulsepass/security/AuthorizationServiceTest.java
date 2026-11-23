@@ -184,9 +184,22 @@ class AuthorizationServiceTest {
     }
 
     @Test
-    void canPurchaseTicket_WhenAdmin_ShouldReturnTrue() {
+    void canPurchaseTicket_WhenAdminBuysForAnotherUser_ShouldReturnFalse() {
+        // H-18: ADMIN has no exception here; buying on someone else's behalf is an IDOR.
         SecurityPrincipal principal = mockPrincipal(2L, "admin@email.com", Role.ADMIN);
-        assertTrue(authorizationService.canPurchaseTicket("andrea@email.com", principal));
+        assertFalse(authorizationService.canPurchaseTicket("andrea@email.com", principal));
+    }
+
+    @Test
+    void canPurchaseTicket_WhenAdminBuysWithOwnEmail_ShouldReturnTrue() {
+        SecurityPrincipal principal = mockPrincipal(2L, "admin@email.com", Role.ADMIN);
+        assertTrue(authorizationService.canPurchaseTicket("ADMIN@email.com", principal));
+    }
+
+    @Test
+    void canPurchaseTicket_WhenStaffBuysForAnotherUser_ShouldReturnFalse() {
+        SecurityPrincipal principal = mockPrincipal(4L, "sofia@email.com", Role.STAFF);
+        assertFalse(authorizationService.canPurchaseTicket("andrea@email.com", principal));
     }
 
     @Test
